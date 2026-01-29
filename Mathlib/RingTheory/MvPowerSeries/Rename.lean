@@ -156,7 +156,7 @@ private lemma coeff_renameFun {p : MvPowerSeries σ R} {x : τ →₀ ℕ} :
 private lemma renameFun_monomial (x) (r : R) :
     renameFun h (monomial x r) = monomial (mapDomain f x) r := by
   classical
-  ext; simp [coeff_renameFun, coeff_monomial, eq_comm, Set.Finite.mem_toFinset]
+  ext; simp [coeff_renameFun, coeff_monomial, eq_comm]
 
 open Finset in
 private theorem renameFun_mul (p q : MvPowerSeries σ R) :
@@ -166,9 +166,7 @@ private theorem renameFun_mul (p q : MvPowerSeries σ R) :
   simp only [coeff_renameFun, coeff_mul, sum_mul_sum, ← sum_product']
   rw [← sum_finset_product' (antidiagonal_renameFunAux h x).toFinset _ _ (by simp),
     ← sum_finset_product' (antidiagonal_renameFunAux' h x).toFinset _ _ (by simp),
-    ← antidiagonal_renameFunAuxImage h x, sum_image]
-  · rintro ⟨⟨⟩, ⟨⟩⟩
-    simpa using by grind
+    ← antidiagonal_renameFunAuxImage h x, sum_image (by rintro ⟨⟨⟩, ⟨⟩⟩; simpa using by grind)]
 
 /-- Rename all the variables in a multivariable power series by a function with finite fibers. -/
 @[no_expose]
@@ -297,7 +295,7 @@ private theorem killComplFun_mul (p q : MvPowerSeries τ R) :
 variable (e) in
 /-- Given an embedding `e : σ ↪ τ`, `MvPowerSeries.killComplFun e` is the function from
 `R[[τ]]` to `R[[σ]]` that is left inverse to `rename e.injective.fiberFinite : R[[σ]] → R[[τ]]`
-and sends the variables in the complement of the range of `f` to `0`. -/
+and sends the variables in the complement of the range of `e` to `0`. -/
 @[no_expose]
 def killCompl : MvPowerSeries τ R →ₐ[R] MvPowerSeries σ R where
   toFun := killComplFun e
