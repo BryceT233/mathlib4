@@ -31,7 +31,7 @@ noncomputable section
 
 open Finsupp
 
-variable {σ τ γ : Type*} {f g : σ → τ}
+variable {σ τ γ : Type*} {f : σ → τ} {g : τ → γ}
 
 section FiberFinite
 
@@ -61,7 +61,7 @@ theorem fiberFinite_iff_tendsto_cofinite : f.FiberFinite ↔ Tendsto f cofinite 
 lemma Injective.fiberFinite (h : f.Injective) : f.FiberFinite :=
   fiberFinite_iff_tendsto_cofinite.mpr h.tendsto_cofinite
 
-lemma FiberFinite.comp {g : τ → γ} (h' : g.FiberFinite) (h : f.FiberFinite) :
+lemma FiberFinite.comp (h' : g.FiberFinite) (h : f.FiberFinite) :
     (g ∘ f).FiberFinite := fun i ↦ by
   simpa [Set.preimage_comp] using h.finite_preimage (h' i)
 
@@ -206,7 +206,7 @@ theorem map_rename (F : R →+* S) (p : MvPowerSeries σ R) :
   ext; simp [coeff_rename]
 
 @[simp]
-theorem rename_rename {g : τ → γ} (h' : g.FiberFinite) (p : MvPowerSeries σ R) :
+theorem rename_rename (h' : g.FiberFinite) (p : MvPowerSeries σ R) :
     rename h' (rename h p) = rename (h'.comp h) p := by
   classical
   ext y; simp only [coeff_rename]
@@ -214,7 +214,7 @@ theorem rename_rename {g : τ → γ} (h' : g.FiberFinite) (p : MvPowerSeries σ
     (fun u ↦ (mapDomain f u, u))) _ _ (by rintro ⟨⟩; simpa using by grind [mapDomain_comp]),
     Finset.sum_image (by simp)]
 
-lemma rename_comp_rename {g : τ → γ} (h' : g.FiberFinite) :
+lemma rename_comp_rename (h' : g.FiberFinite) :
     (rename (R := R) h').comp (rename h) = rename (h'.comp h) :=
   AlgHom.ext fun p ↦ rename_rename h h' p
 
