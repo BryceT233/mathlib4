@@ -162,7 +162,7 @@ private theorem renameFun_mul (p q : MvPowerSeries σ R) :
   simp only [coeff_renameFun, coeff_mul, sum_mul_sum, ← sum_product']
   rw [← sum_finset_product' (antidiagonal_renameFunAux h x).toFinset _ _ (by simp),
     ← sum_finset_product' (antidiagonal_renameFunAux' h x).toFinset _ _ (by simp),
-    ← antidiagonal_renameFunAuxImage h x, sum_image (by rintro ⟨⟨⟩, ⟨⟩⟩; simpa using by grind)]
+    ← antidiagonal_renameFunAuxImage h x, sum_image fun _ ↦ by simpa using by grind]
 
 /-- Rename all the variables in a multivariable power series by a function with finite fibers. -/
 @[no_expose]
@@ -215,7 +215,7 @@ theorem rename_rename (h' : g.FiberFinite) (p : MvPowerSeries σ R) :
   classical
   ext y; simp only [coeff_rename]
   rw [← Finset.sum_finset_product' ((mapDomain_fiberFinite (h'.comp h) y).toFinset.image
-    (fun u ↦ (mapDomain f u, u))) _ _ (by rintro ⟨⟩; simpa using by grind [mapDomain_comp]),
+    (fun u ↦ (mapDomain f u, u))) _ _ (by simpa using by grind [mapDomain_comp]),
     Finset.sum_image (by simp)]
 
 lemma rename_comp_rename (h' : g.FiberFinite) :
