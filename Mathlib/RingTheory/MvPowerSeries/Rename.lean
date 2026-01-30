@@ -65,7 +65,7 @@ lemma FiberFinite.comp (h' : g.FiberFinite) (h : f.FiberFinite) :
     (g ∘ f).FiberFinite := fun i ↦ by
   simpa [Set.preimage_comp] using h.finite_preimage (h' i)
 
-lemma FiberFinite.id : (id (α := σ)).FiberFinite := Function.injective_id.fiberFinite
+lemma FiberFinite.id : (id (α := σ)).FiberFinite := injective_id.fiberFinite
 
 /-- Given `f : σ → τ` with finite fibers and `v : σ → M`, `mapDomain f v : τ → M`
 is the function whose value at `a : τ` is the sum of `v x` over all `x`
