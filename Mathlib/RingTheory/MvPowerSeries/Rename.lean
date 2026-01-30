@@ -65,8 +65,6 @@ lemma FiberFinite.comp (h' : g.FiberFinite) (h : f.FiberFinite) :
     (g ∘ f).FiberFinite := fun i ↦ by
   simpa [Set.preimage_comp] using h.finite_preimage (h' i)
 
-lemma FiberFinite.id : (id (α := σ)).FiberFinite := injective_id.fiberFinite
-
 /-- Given `f : σ → τ` with finite fibers and `v : σ → M`, `mapDomain f v : τ → M`
 is the function whose value at `a : τ` is the sum of `v x` over all `x`
 such that `f x = a`. -/
@@ -227,12 +225,13 @@ lemma rename_comp_rename (h' : g.FiberFinite) :
   AlgHom.ext fun p ↦ rename_rename h h' p
 
 @[simp]
-theorem rename_id : rename (Function.FiberFinite.id) = AlgHom.id R (MvPowerSeries σ R) := by
+theorem rename_id : rename (Function.injective_id.fiberFinite) =
+    AlgHom.id R (MvPowerSeries σ R) := by
   ext _ y
   simpa [coeff_rename] using Finset.sum_eq_single y (by simp) (by simp)
 
 lemma rename_id_apply (p : MvPowerSeries σ R) :
-    rename (Function.FiberFinite.id) p = p := by simp
+    rename (Function.injective_id.fiberFinite) p = p := by simp
 
 @[simp]
 theorem constantCoeff_rename (p : MvPowerSeries σ R) :
