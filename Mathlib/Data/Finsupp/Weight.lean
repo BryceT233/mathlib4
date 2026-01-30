@@ -266,9 +266,8 @@ theorem degree_mapDomain_eq {M τ : Type*} {f : σ → τ} [AddCommMonoid M] [Su
   classical
   trans (x.mapDomain f).sum (fun _ ↦ id)
   · simp [degree, sum]
-  simp only [sum, mapDomain_support_of_subsingletonAddUnits, id_eq, degree, AddMonoidHom.coe_mk,
-    ZeroHom.coe_mk]
-  exact Finset.sum_image' _ (fun _ _ ↦ mapDomain_apply_eq_sum)
+  simpa [sum, mapDomain_support_of_subsingletonAddUnits, degree] using Finset.sum_image' _
+    (fun _ _ ↦ mapDomain_apply_eq_sum)
 
 theorem degree_comapDomain_le {M τ : Type*} {f : σ → τ} [AddCommMonoid M] [PartialOrder M]
     [CanonicallyOrderedAdd M] {x : τ →₀ M} (hf : Set.InjOn f (f ⁻¹' x.support)) :
