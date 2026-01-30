@@ -51,12 +51,10 @@ lemma FiberFinite.finite_preimage (h : f.FiberFinite) {s : Set τ} (hs : s.Finit
   exact Set.Finite.union (h a) h'
 
 open Filter in
-theorem fiberFinite_iff_tendsto_cofinite : f.FiberFinite ↔ Tendsto f cofinite cofinite := by
-  refine ⟨fun h ↦ fun s ↦ ?_, fun h ↦ fun i ↦ ?_⟩
-  · rw [mem_cofinite, mem_map, mem_cofinite, ← Set.preimage_compl]
-    exact fun hs ↦ h.finite_preimage hs
-  simpa [Set.compl_eq_univ_diff] using h (show Set.univ \ {i} ∈ cofinite by
-    simp [Set.compl_eq_univ_diff])
+theorem fiberFinite_iff_tendsto_cofinite : f.FiberFinite ↔ Tendsto f cofinite cofinite :=
+  ⟨fun h _ ↦ by simpa using h.finite_preimage, fun h i ↦ by
+    simpa [Set.compl_eq_univ_diff] using h (show Set.univ \ {i} ∈ cofinite by
+      simp [Set.compl_eq_univ_diff])⟩
 
 lemma Injective.fiberFinite (h : f.Injective) : f.FiberFinite :=
   fiberFinite_iff_tendsto_cofinite.mpr h.tendsto_cofinite
