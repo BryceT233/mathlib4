@@ -183,12 +183,8 @@ theorem rename_monomial (x) (r : R) :
 @[simp]
 theorem coeff_embDomain_rename {e : σ ↪ τ} {p : MvPowerSeries σ R} {x : σ →₀ ℕ} :
     coeff (embDomain e x) (rename e.injective.fiberFinite p) = p.coeff x := by
-  rw [coeff_rename, Finset.sum_eq_single x]
-  · simp only [Set.Finite.mem_toFinset, Set.mem_preimage, Set.mem_singleton_iff, ne_eq]
-    intro y hy y_ne_x
-    rw [← embDomain_eq_mapDomain, embDomain_inj] at hy
-    contradiction
-  · simp [← embDomain_eq_mapDomain]
+  rw [coeff_rename, Finset.sum_eq_single x _ (by simp [← embDomain_eq_mapDomain])]
+  simpa using fun _ h h' ↦ by simp [← embDomain_eq_mapDomain, embDomain_inj, h'] at h
 
 lemma coeff_rename_eq_zero_of_notMem_range_mapDomain (p : MvPowerSeries σ R) {x : τ →₀ ℕ}
     (h' : x ∉ Set.range (mapDomain f)) : (rename h p).coeff x = 0 := by
