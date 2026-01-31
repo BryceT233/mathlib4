@@ -1338,10 +1338,7 @@ theorem mapDomain_support_of_subsingletonAddUnits {M σ τ : Type*} [AddCommMono
   ext t
   rw [mem_support_iff, ne_eq, Finset.mem_image]
   refine ⟨?_, fun ⟨i, i_in, hi⟩ ↦ ?_⟩
-  · contrapose!
-    simp only [mem_support_iff, ne_eq, mapDomain, sum, coe_finset_sum, Finset.sum_apply,
-      single_apply, Finset.sum_eq_zero_iff, ite_eq_right_iff]
-    grind only
+  · simpa [mapDomain, sum, single_apply] using fun i h h' _ ↦ ⟨i, h, h'⟩
   simpa [mapDomain, sum, ← hi, single_apply] using ⟨i, by simp [mem_support_iff.mp i_in]⟩
 
 open Classical in
@@ -1352,10 +1349,9 @@ theorem mapDomain_apply_eq_sum {M σ τ : Type*} [AddCommMonoid M] {f : σ → �
 theorem mapDomain_apply_eq_zero_iff {M σ τ : Type*} [AddCommMonoid M] {f : σ → τ}
     [Subsingleton (AddUnits M)] {x : σ →₀ M} : mapDomain (M := M) f x = 0 ↔ x = 0 := by
   refine ⟨fun h ↦ Finsupp.ext (fun i ↦ ?_), fun h ↦ by rw [h, mapDomain_zero]⟩
-  simp only [Finsupp.ext_iff, coe_zero, Pi.zero_apply] at h
-  specialize h (f i)
-  simp only [mapDomain_apply_eq_sum, Finset.sum_eq_zero_iff, Finset.mem_filter, mem_support_iff,
-    ne_eq, and_imp] at h
+  replace h := Finsupp.ext_iff.mp h (f i)
+  simp only [mapDomain_apply_eq_sum, coe_zero, Pi.zero_apply, sum_eq_zero_iff, mem_filter,
+    mem_support_iff, ne_eq, and_imp] at h
   grind
 
 end Finsupp
