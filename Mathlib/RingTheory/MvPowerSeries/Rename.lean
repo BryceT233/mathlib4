@@ -192,11 +192,7 @@ theorem coeff_embDomain_rename {e : σ ↪ τ} {p : MvPowerSeries σ R} {x : σ 
 
 lemma coeff_rename_eq_zero_of_notMem_range_mapDomain (p : MvPowerSeries σ R) {x : τ →₀ ℕ}
     (h' : x ∉ Set.range (mapDomain f)) : (rename h p).coeff x = 0 := by
-  rw [← Set.preimage_singleton_eq_empty] at h'
-  trans ∑ x ∈ ∅, coeff x p
-  · rw [coeff_rename]; congr
-    simpa
-  simp
+  simp [coeff_rename, Set.Finite.toFinset, Set.preimage_singleton_eq_empty.mpr h']
 
 @[simp]
 theorem rename_C (r : R) : rename h (C r : MvPowerSeries σ R) = C r := rename_monomial h 0 r
