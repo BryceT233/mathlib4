@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Bingyu Xia. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Bingyu Xia, Andrew Yang
+Authors: Bingyu Xia
 -/
 module
 
@@ -55,6 +55,10 @@ theorem fiberFinite_iff_tendsto_cofinite : f.FiberFinite ↔ Tendsto f cofinite 
   ⟨fun h _ ↦ by simpa using h.finite_preimage, fun h i ↦ by
     simpa [Set.compl_eq_univ_diff] using h (show Set.univ \ {i} ∈ cofinite by
       simp [Set.compl_eq_univ_diff])⟩
+
+open Filter in
+lemma FiberFinite.tendsto_cofinite (h : f.FiberFinite) : Tendsto f cofinite cofinite :=
+  fiberFinite_iff_tendsto_cofinite.mp h
 
 lemma Injective.fiberFinite (h : f.Injective) : f.FiberFinite :=
   fiberFinite_iff_tendsto_cofinite.mpr h.tendsto_cofinite
