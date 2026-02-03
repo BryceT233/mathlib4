@@ -277,6 +277,7 @@ theorem degree_comapDomain_le {M τ : Type*} {f : σ → τ} [AddCommMonoid M] [
   classical
   simpa [degree, comapDomain, Finset.sum_preimage' f x.support hf x] using
     Finset.sum_le_sum_of_subset (Finset.filter_subset ..)
+
 lemma degree_mono {R : Type*} [AddCommMonoid R] [PartialOrder R] [CanonicallyOrderedAdd R] :
     Monotone (Finsupp.degree (σ := σ) (R := R)) :=
   fun _ _ e ↦
