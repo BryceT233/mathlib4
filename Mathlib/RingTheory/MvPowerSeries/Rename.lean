@@ -115,7 +115,7 @@ private theorem antidiagonal_renameFunAux (h : f.FiberFinite) (x : τ →₀ ℕ
   apply Set.Finite.subset (s := ↑((mapDomain_fiberFinite h x).toFinset.sup
     (fun y ↦ Finset.product {y} (Finset.antidiagonal y))))
   · exact Finset.finite_toSet ..
-  · simpa [Set.subset_def] using by grind
+  · simp [Set.subset_def]; grind
 
 open Classical in
 private theorem antidiagonal_renameFunAux' (h : f.FiberFinite) (x : τ →₀ ℕ) :
@@ -125,7 +125,7 @@ private theorem antidiagonal_renameFunAux' (h : f.FiberFinite) (x : τ →₀ �
   apply Set.Finite.subset (s := ↑((Finset.antidiagonal x).sup (fun q ↦ Finset.product {q}
     ((mapDomain_fiberFinite h q.1).toFinset ×ˢ (mapDomain_fiberFinite h q.2).toFinset))))
   · exact Finset.finite_toSet ..
-  · simpa [Set.subset_def] using by grind
+  · simp [Set.subset_def]; grind
 
 open Classical in
 private theorem antidiagonal_renameFunAuxImage (h : f.FiberFinite) (x : τ →₀ ℕ) :
@@ -147,13 +147,12 @@ section rename
 variable (h : f.FiberFinite)
 
 /-- Implementation detail for `rename`. Use `MvPowerSeries.rename` instead. -/
-def renameFun (p : MvPowerSeries σ R) : MvPowerSeries τ R :=
-    (mapDomain_fiberFinite h).mapDomain p
+def renameFun : MvPowerSeries σ R → MvPowerSeries τ R := (mapDomain_fiberFinite h).mapDomain
 
 private lemma coeff_renameFun {p : MvPowerSeries σ R} {x : τ →₀ ℕ} :
     (renameFun h p).coeff x = (mapDomain_fiberFinite h x).toFinset.sum (p.coeff ·) := by rfl
 
-private lemma renameFun_monomial (x) (r : R) :
+private lemma renameFun_monomial (x : σ →₀ ℕ) (r : R) :
     renameFun h (monomial x r) = monomial (mapDomain f x) r := by
   classical
   ext; simp [coeff_renameFun, coeff_monomial, eq_comm]
@@ -166,7 +165,7 @@ private theorem renameFun_mul (p q : MvPowerSeries σ R) :
   simp only [coeff_renameFun, coeff_mul, sum_mul_sum, ← sum_product']
   rw [← sum_finset_product' (antidiagonal_renameFunAux h x).toFinset _ _ (by simp),
     ← sum_finset_product' (antidiagonal_renameFunAux' h x).toFinset _ _ (by simp),
-    ← antidiagonal_renameFunAuxImage h x, sum_image fun _ ↦ by simpa using by grind]
+    ← antidiagonal_renameFunAuxImage h x, sum_image fun _ ↦ by simp; grind]
 
 /-- Rename all the variables in a multivariable power series by a function with finite fibers. -/
 @[no_expose]
@@ -190,7 +189,7 @@ theorem coeff_embDomain_rename {e : σ ↪ τ} {p : MvPowerSeries σ R} {x : σ 
   rw [coeff_rename, Finset.sum_eq_single x _ (by simp [← embDomain_eq_mapDomain])]
   simpa using fun _ h h' ↦ by simp [← embDomain_eq_mapDomain, embDomain_inj, h'] at h
 
-lemma coeff_rename_eq_zero_of_notMem_range_mapDomain (p : MvPowerSeries σ R) {x : τ →₀ ℕ}
+lemma coeff_rename_eq_zero (p : MvPowerSeries σ R) {x : τ →₀ ℕ}
     (h' : x ∉ Set.range (mapDomain f)) : (rename h p).coeff x = 0 := by
   simp [coeff_rename, Set.Finite.toFinset, Set.preimage_singleton_eq_empty.mpr h']
 
@@ -211,7 +210,7 @@ theorem rename_rename (h' : g.FiberFinite) (p : MvPowerSeries σ R) :
   classical
   ext y; simp only [coeff_rename]
   rw [← Finset.sum_finset_product' ((mapDomain_fiberFinite (h'.comp h) y).toFinset.image
-    (fun u ↦ (mapDomain f u, u))) _ _ (by simpa using by grind [mapDomain_comp]),
+    (fun u ↦ (mapDomain f u, u))) _ _ (by simp; grind [mapDomain_comp]),
     Finset.sum_image (by simp)]
 
 lemma rename_comp_rename (h' : g.FiberFinite) :
@@ -266,22 +265,21 @@ variable {e : σ ↪ τ}
 
 variable (e) in
 /-- Implementation detail for `killCompl`. Use `MvPowerSeries.killCompl` instead. -/
-def killComplFun (p : MvPowerSeries τ R) : MvPowerSeries σ R :=
-  fun x ↦ coeff (embDomain e x) p
+def killComplFun (p : MvPowerSeries τ R) : MvPowerSeries σ R := fun x ↦ coeff (embDomain e x) p
 
 private theorem coeff_killComplFun (p : MvPowerSeries τ R) (x : σ →₀ ℕ) :
   coeff x (killComplFun e p) = coeff (embDomain e x) p := by rfl
 
-private theorem killComplFun_monomial_embDomain (x) (r : R) :
+private theorem killComplFun_monomial_embDomain (x : σ →₀ ℕ) (r : R) :
     killComplFun e (monomial (embDomain e x) r) = monomial x r := by
   classical
   ext; simp [coeff_killComplFun, coeff_monomial, embDomain_inj]
 
-private theorem killComplFun_monomial_eq_zero_of_notMem_range_embDomain {x} (r : R)
+private theorem killComplFun_monomial_eq_zero {x : τ →₀ ℕ} (r : R)
     (h : x ∉ Set.range (embDomain e)) : killComplFun e (monomial x r) = 0 := by
   classical
-  ext
-  simpa [coeff_killComplFun, coeff_monomial] using by grind
+  ext; simp [coeff_killComplFun, coeff_monomial]
+  grind
 
 private theorem killComplFun_mul (p q : MvPowerSeries τ R) :
     killComplFun e (p * q) = killComplFun e p * killComplFun e q := by
@@ -307,13 +305,13 @@ def killCompl : MvPowerSeries τ R →ₐ[R] MvPowerSeries σ R where
 lemma coeff_killCompl (p : MvPowerSeries τ R) (x : σ →₀ ℕ) :
     coeff x (killCompl e p) = coeff (embDomain e x) p := by rfl
 
-lemma killCompl_monomial_embDomain (x) (r : R) :
+lemma killCompl_monomial_embDomain (x : σ →₀ ℕ) (r : R) :
     killCompl e (monomial (embDomain e x) r) = monomial x r :=
   killComplFun_monomial_embDomain x r
 
-lemma killCompl_monomial_eq_zero_of_notMem_range_embDomain {x} (r : R)
+lemma killCompl_monomial_eq_zero {x : τ →₀ ℕ} (r : R)
     (h : x ∉ Set.range (embDomain e)) : killCompl e (monomial x r) = 0 :=
-  killComplFun_monomial_eq_zero_of_notMem_range_embDomain r h
+  killComplFun_monomial_eq_zero r h
 
 @[simp]
 lemma killCompl_C (r : R) : killCompl e (C r) = C r := by
@@ -322,15 +320,14 @@ lemma killCompl_C (r : R) : killCompl e (C r) = C r := by
 @[simp]
 theorem killCompl_X (i : σ) : killCompl (R := R) e (X (e i)) = X i := by
   classical
-  ext
-  simp [coeff_X, coeff_killCompl, ← embDomain_single]
+  ext; simp [coeff_X, coeff_killCompl, ← embDomain_single]
 
-theorem killCompl_X_eq_zero_of_notMem_range {t} (h : t ∉ Set.range e) :
+theorem killCompl_X_eq_zero {t : τ} (h : t ∉ Set.range e) :
     killCompl (R := R) e (X t) = 0 := by
   replace h : single t 1 ∉ Set.range (embDomain e) := by
     rwa [mem_range_embDomain_iff, support_single_ne_zero _ (by simp), Finset.coe_singleton,
       Set.singleton_subset_iff]
-  simpa using killCompl_monomial_eq_zero_of_notMem_range_embDomain (1 : R) h
+  simpa using killCompl_monomial_eq_zero (1 : R) h
 
 theorem killCompl_comp_rename :
     (killCompl e).comp (rename e.injective.fiberFinite) = AlgHom.id R _ := by
