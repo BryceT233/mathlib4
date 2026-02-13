@@ -108,28 +108,26 @@ theorem mapDomain_fiberFinite (h : f.FiberFinite) : (mapDomain (M := ℕ) f).Fib
   simpa [← hy, mapDomain, sum, Finset.subset_iff, single_apply, s] using
     fun i hi ↦ ⟨i, by simp [hi]⟩
 
-open Classical in
-private theorem antidiagonal_renameFunAux (h : f.FiberFinite) (x : τ →₀ ℕ) :
-    {p : (σ →₀ ℕ) × (σ →₀ ℕ) × (σ →₀ ℕ) |
-      (p.1).mapDomain f = x ∧ p.2 ∈ Finset.antidiagonal p.1}.Finite := by
+private theorem antidiagonal_renameFunAux [DecidableEq σ] (h : f.FiberFinite)
+    (x : τ →₀ ℕ) : {p : (σ →₀ ℕ) × (σ →₀ ℕ) × (σ →₀ ℕ) | (p.1).mapDomain f = x ∧
+      p.2 ∈ Finset.antidiagonal p.1}.Finite := by
   apply Set.Finite.subset (s := ↑((mapDomain_fiberFinite h x).toFinset.sup
     (fun y ↦ Finset.product {y} (Finset.antidiagonal y))))
   · exact Finset.finite_toSet ..
   · simp [Set.subset_def]; grind
 
-open Classical in
-private theorem antidiagonal_renameFunAux' (h : f.FiberFinite) (x : τ →₀ ℕ) :
-    {p : ((τ →₀ ℕ) × (τ →₀ ℕ)) × (σ →₀ ℕ) × (σ →₀ ℕ) | p.1 ∈ Finset.antidiagonal x ∧
-      p.2 ∈ (mapDomain_fiberFinite h p.1.1).toFinset ×ˢ
-        (mapDomain_fiberFinite h p.1.2).toFinset}.Finite := by
+private theorem antidiagonal_renameFunAux' [DecidableEq τ] (h : f.FiberFinite)
+    (x : τ →₀ ℕ) : {p : ((τ →₀ ℕ) × (τ →₀ ℕ)) × (σ →₀ ℕ) × (σ →₀ ℕ) | p.1 ∈ Finset.antidiagonal x
+      ∧ p.2 ∈ (mapDomain_fiberFinite h p.1.1).toFinset ×ˢ
+    (mapDomain_fiberFinite h p.1.2).toFinset}.Finite := by
+  classical
   apply Set.Finite.subset (s := ↑((Finset.antidiagonal x).sup (fun q ↦ Finset.product {q}
     ((mapDomain_fiberFinite h q.1).toFinset ×ˢ (mapDomain_fiberFinite h q.2).toFinset))))
   · exact Finset.finite_toSet ..
   · simp [Set.subset_def]; grind
 
-open Classical in
-private theorem antidiagonal_renameFunAuxImage (h : f.FiberFinite) (x : τ →₀ ℕ) :
-    (antidiagonal_renameFunAux' h x).toFinset.image (fun (_, b) ↦ (b.1 + b.2, b)) =
+private theorem antidiagonal_renameFunAuxImage [DecidableEq σ] [DecidableEq τ] (h : f.FiberFinite)
+    (x : τ →₀ ℕ) : (antidiagonal_renameFunAux' h x).toFinset.image (fun (_, b) ↦ (b.1 + b.2, b)) =
       (antidiagonal_renameFunAux h x).toFinset := by
   ext ⟨_,_,_⟩
   simpa using fun h ↦ by rw [← h, mapDomain_add]
