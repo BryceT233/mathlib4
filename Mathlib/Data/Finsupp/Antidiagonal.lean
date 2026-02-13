@@ -73,10 +73,9 @@ theorem antidiagonal_single (a : α) (n : ℕ) :
   · rintro ⟨a, b, rfl, rfl, rfl⟩
     exact (single_add _ _ _).symm
 
-open Classical in
-theorem antidiagonal_image_prodMap_embDomain {σ τ : Type*} (f : σ ↪ τ) (y : σ →₀ ℕ) :
-  image (Prod.map (embDomain f) (embDomain f)) (antidiagonal y) =
-    antidiagonal (embDomain f y) := by
+theorem antidiagonal_image_prodMap_embDomain {β : Type*} [DecidableEq β] (f : α ↪ β)
+    (y : α →₀ ℕ) : image (Prod.map (embDomain f) (embDomain f)) (antidiagonal y) =
+      antidiagonal (embDomain f y) := by
   ext ⟨u, v⟩
   simp only [mem_image, mem_antidiagonal, Prod.exists, Prod.map_apply,
     Prod.mk.injEq]
