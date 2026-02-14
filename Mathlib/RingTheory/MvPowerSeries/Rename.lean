@@ -114,7 +114,7 @@ private theorem antidiagonal_renameFunAux [DecidableEq σ] (h : f.FiberFinite)
   apply Set.Finite.subset (s := ↑((mapDomain_fiberFinite h x).toFinset.sup
     (fun y ↦ Finset.product {y} (Finset.antidiagonal y))))
   · exact Finset.finite_toSet ..
-  · simp [Set.subset_def]; grind
+  · intro; aesop
 
 private theorem antidiagonal_renameFunAux' [DecidableEq τ] (h : f.FiberFinite)
     (x : τ →₀ ℕ) : {p : ((τ →₀ ℕ) × (τ →₀ ℕ)) × (σ →₀ ℕ) × (σ →₀ ℕ) | p.1 ∈ Finset.antidiagonal x
@@ -124,13 +124,13 @@ private theorem antidiagonal_renameFunAux' [DecidableEq τ] (h : f.FiberFinite)
   apply Set.Finite.subset (s := ↑((Finset.antidiagonal x).sup (fun q ↦ Finset.product {q}
     ((mapDomain_fiberFinite h q.1).toFinset ×ˢ (mapDomain_fiberFinite h q.2).toFinset))))
   · exact Finset.finite_toSet ..
-  · simp [Set.subset_def]; grind
+  · intro; aesop
 
 private theorem antidiagonal_renameFunAuxImage [DecidableEq σ] [DecidableEq τ] (h : f.FiberFinite)
     (x : τ →₀ ℕ) : (antidiagonal_renameFunAux' h x).toFinset.image (fun (_, b) ↦ (b.1 + b.2, b)) =
       (antidiagonal_renameFunAux h x).toFinset := by
   ext ⟨_,_,_⟩
-  simpa using fun h ↦ by rw [← h, mapDomain_add]
+  simp; aesop (add simp mapDomain_add)
 
 end Finsupp
 
@@ -163,7 +163,7 @@ private theorem renameFun_mul (p q : MvPowerSeries σ R) :
   simp only [coeff_renameFun, coeff_mul, sum_mul_sum, ← sum_product']
   rw [← sum_finset_product' (antidiagonal_renameFunAux h x).toFinset _ _ (by simp),
     ← sum_finset_product' (antidiagonal_renameFunAux' h x).toFinset _ _ (by simp),
-    ← antidiagonal_renameFunAuxImage h x, sum_image fun _ ↦ by simp; grind]
+    ← antidiagonal_renameFunAuxImage h x, sum_image fun _ ↦ by simp; aesop]
 
 /-- Rename all the variables in a multivariable power series by a function with finite fibers. -/
 @[no_expose]
@@ -208,7 +208,7 @@ theorem rename_rename (h' : g.FiberFinite) (p : MvPowerSeries σ R) :
   classical
   ext y; simp only [coeff_rename]
   rw [← Finset.sum_finset_product' ((mapDomain_fiberFinite (h'.comp h) y).toFinset.image
-    (fun u ↦ (mapDomain f u, u))) _ _ (by simp; grind [mapDomain_comp]),
+    (fun u ↦ (mapDomain f u, u))) _ _ (by simp; aesop (add simp mapDomain_comp)),
     Finset.sum_image (by simp)]
 
 lemma rename_comp_rename (h' : g.FiberFinite) :
@@ -277,7 +277,7 @@ private theorem killComplFun_monomial_eq_zero {x : τ →₀ ℕ} (r : R)
     (h : x ∉ Set.range (embDomain e)) : killComplFun e (monomial x r) = 0 := by
   classical
   ext; simp [coeff_killComplFun, coeff_monomial]
-  grind
+  aesop
 
 private theorem killComplFun_mul (p q : MvPowerSeries τ R) :
     killComplFun e (p * q) = killComplFun e p * killComplFun e q := by
