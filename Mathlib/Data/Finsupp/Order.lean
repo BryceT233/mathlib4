@@ -276,7 +276,7 @@ theorem isLowerSet_range_embDomain (f : α ↪ β) :
   obtain ⟨w, hw⟩ := exists_add_of_le h
   rw [mem_range_embDomain_iff]
   trans ↑(y + w).support
-  · simpa [subset_iff] using by grind
+  · intro; aesop
   simp [← hw]
 
 end Nat
