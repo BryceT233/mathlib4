@@ -9,7 +9,7 @@ public import Mathlib.RingTheory.Ideal.Maps
 public import Mathlib.Topology.Algebra.Nonarchimedean.Bases
 import Mathlib.Topology.Algebra.UniformRing  -- shake: keep (used in `example` only)
 public import Mathlib.Topology.Algebra.IsUniformGroup.Defs
-
+public import Mathlib.Topology.Algebra.TopologicallyNilpotent
 
 /-!
 # Adic topology
@@ -110,6 +110,15 @@ theorem hasBasis_nhds_adic (I : Ideal R) (x : R) :
   letI := I.adicTopology
   have := I.hasBasis_nhds_zero_adic.map fun y => x + y
   rwa [map_add_left_nhds_zero x] at this
+
+theorem isLinearTopology (I : Ideal R) : @IsLinearTopology R R _ _ _ I.adicTopology :=
+  @IsLinearTopology.mk R R _ _ _ I.adicTopology (by
+    rw [Filter.hasBasis_iff]
+    refine fun U ↦ ⟨fun hU ↦ ?_, fun ⟨N, hN_mem, hN_subset⟩ ↦
+      Filter.mem_of_superset hN_mem hN_subset⟩
+    have h_basis := Ideal.hasBasis_nhds_zero_adic I
+    rcases h_basis.mem_iff.mp hU with ⟨n, _, hn_subset⟩
+    exact ⟨I ^ n, h_basis.mem_of_mem trivial, hn_subset⟩)
 
 variable (I : Ideal R) (M : Type*) [AddCommGroup M] [Module R M]
 
@@ -244,6 +253,30 @@ instance (priority := 100) : UniformSpace R :=
 
 instance (priority := 100) : IsUniformAddGroup R :=
   isUniformAddGroup_of_addCommGroup
+
+instance (priority := 100) : IsLinearTopology R R := Ideal.isLinearTopology i
+
+variable {R} in
+theorem continuous_of_map_le {S : Type*} [CommRing S] [WithIdeal S] {f : R →+* S}
+    (hf : i.map f ≤ i) : Continuous f := continuous_of_continuousAt_zero f (by
+  have hR := Ideal.hasBasis_nhds_zero_adic (i : Ideal R)
+  have hS := Ideal.hasBasis_nhds_zero_adic (i : Ideal S)
+  rw [ContinuousAt, map_zero, hR.tendsto_iff hS]
+  refine fun n _ ↦ ⟨n, trivial, fun x hx => ?_⟩
+  have : (i ^ n).map f ≤ i ^ n := by
+    simpa [Ideal.map_pow] using Ideal.pow_right_mono hf n
+  exact this (Ideal.mem_map_of_mem f hx))
+
+variable {R} in
+lemma isTopologicallyNilpotent_of_mem {a : R} (ha : a ∈ i) :
+    IsTopologicallyNilpotent a := by
+  have h_basis := Ideal.hasBasis_nhds_zero_adic (i : Ideal R)
+  rw [IsTopologicallyNilpotent, h_basis.tendsto_right_iff]
+  intro m _; rw [Filter.eventually_atTop]
+  refine ⟨m, fun n hn ↦ ?_⟩
+  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hn
+  rw [pow_add, SetLike.mem_coe]
+  exact Ideal.mul_mem_right _ _ (Ideal.pow_mem_pow ha m)
 
 /-- The adic topology on an `R` module coming from the ideal `WithIdeal.I`.
 This cannot be an instance because `R` cannot be inferred from `M`. -/
