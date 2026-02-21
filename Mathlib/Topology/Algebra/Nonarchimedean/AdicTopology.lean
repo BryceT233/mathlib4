@@ -250,7 +250,7 @@ instance (priority := 100) : UniformSpace R :=
 instance (priority := 100) : IsUniformAddGroup R :=
   isUniformAddGroup_of_addCommGroup
 
-instance (priority := 100) : IsLinearTopology R R := Ideal.isLinearTopology i
+instance (priority := 100) : IsLinearTopology R R := i.isLinearTopology
 
 variable {R} in
 theorem continuous_of_map_le {S : Type*} [CommRing S] [WithIdeal S] {f : R →+* S}
