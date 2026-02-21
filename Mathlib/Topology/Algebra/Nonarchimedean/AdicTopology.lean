@@ -260,8 +260,7 @@ theorem continuous_of_map_le {S : Type*} [CommRing S] [WithIdeal S] {f : R →+*
   simpa [Ideal.map_pow] using Ideal.pow_right_mono hf n)
 
 variable {R} in
-lemma isTopologicallyNilpotent_of_mem {a : R} (ha : a ∈ i) :
-    IsTopologicallyNilpotent a := by
+lemma isTopologicallyNilpotent_of_mem {a : R} (ha : a ∈ i) : IsTopologicallyNilpotent a := by
   suffices ∀ m : ℕ, ∃ n₀, ∀ n, n₀ ≤ n → a ^ n ∈ i ^ m by
     simpa [IsTopologicallyNilpotent, i.hasBasis_nhds_zero_adic.tendsto_right_iff]
   exact fun m ↦ ⟨m, fun n hn ↦ Ideal.pow_le_pow_right hn (Ideal.pow_mem_pow ha _)⟩
