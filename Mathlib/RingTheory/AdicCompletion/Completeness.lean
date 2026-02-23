@@ -6,10 +6,8 @@ Authors: Bingyu Xia
 module
 
 public import Mathlib.Algebra.Lie.OfAssociative
-public import Mathlib.LinearAlgebra.FreeProduct.Basic
 public import Mathlib.RingTheory.AdicCompletion.Exactness
 public import Mathlib.RingTheory.Finiteness.Ideal
-public import Mathlib.Data.Finsupp.Pointwise
 
 /-!
 # Completeness of the Adic Completion for Finitely Generated Ideals
