@@ -165,7 +165,7 @@ abbrev AdicCompletion.transitionMap {m n : ℕ} (hmn : m ≤ n) := factorPow I M
 /-- The completion of a module with respect to an ideal.
 
 This is Hausdorff but not necessarily complete: a classical sufficient condition for
-completeness is that `M` be finitely generated [Stacks, 0G1Q]. -/
+completeness is that `I` be finitely generated [Stacks, 05GG]. -/
 def AdicCompletion : Type _ :=
   { f : ∀ n : ℕ, M ⧸ (I ^ n • ⊤ : Submodule R M) //
     ∀ {m n} (hmn : m ≤ n), AdicCompletion.transitionMap I M hmn (f n) = f m }
@@ -675,6 +675,22 @@ theorem of_ofLinearEquiv_symm (x : AdicCompletion I M) :
   simp [ofLinearEquiv]
 
 end Bijective
+
+set_option backward.isDefEq.respectTransparency false in
+theorem pow_smul_top_le_eval_ker (n : ℕ) : I ^ n • ⊤ ≤ (eval I M n).ker := by
+  simp only [smul_le, mem_top, LinearMap.mem_ker, map_smul, coe_eval, forall_const]
+  intro r r_in x
+  rw [← Submodule.Quotient.mk_out (x.val n), ← Quotient.mk_smul, Quotient.mk_eq_zero]
+  exact smul_mem_smul r_in mem_top
+
+set_option backward.isDefEq.respectTransparency false in
+lemma val_apply_mem_smul_top_iff {m n : ℕ} {x : AdicCompletion I M}
+    (m_ge : n ≤ m) : x.val m ∈ I ^ n • (⊤ : Submodule R (M ⧸ I ^ m • ⊤)) ↔ x.val n = 0 := by
+  refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
+  · rw [← x.prop m_ge, transitionMap, Submodule.factorPow, Submodule.factor, mapQ,
+      ← LinearMap.mem_ker]
+    simpa [ker_liftQ]
+  simpa [mapQ, h, ← LinearMap.mem_ker, ker_liftQ] using x.prop m_ge
 
 end AdicCompletion
 
