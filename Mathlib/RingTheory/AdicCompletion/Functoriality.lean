@@ -512,6 +512,21 @@ theorem finsuppSumInv_single_of (i : σ) (m : M) :
     finsuppSumInv I M σ (of I (σ →₀ M) (single i m)) = single i (of I M m) := by
   simp [← finsuppSum_single_of, ← comp_apply, finsuppSumInv_comp_sum]
 
+variable (σ M I) in
+/-- If `σ` is finite, `AdicCompletion.finsuppSum` is an isomorphism. -/
+def finsuppSumEquivOfFintype :
+    (σ →₀ (AdicCompletion I M)) ≃ₗ[AdicCompletion I R] AdicCompletion I (σ →₀ M) :=
+  LinearEquiv.ofLinear (finsuppSum I M σ) (finsuppSumInv I M σ) finsuppSum_comp_sumInv
+    finsuppSumInv_comp_sum
+
+@[simp]
+theorem finsuppSumEquivOfFintype_apply (x : σ →₀ AdicCompletion I M) :
+    finsuppSumEquivOfFintype I M σ x = finsuppSum I M σ x := rfl
+
+@[simp]
+theorem finsuppSumEquivOfFintype_symm_apply (x : AdicCompletion I (σ →₀ M)) :
+    (finsuppSumEquivOfFintype I M σ).symm x = finsuppSumInv I M σ x := rfl
+
 end finsuppSum
 
 end AdicCompletion
