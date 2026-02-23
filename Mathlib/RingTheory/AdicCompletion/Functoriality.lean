@@ -453,6 +453,67 @@ theorem map_surjective_of_mkQ_comp_surjective {f : M →ₗ[R] N}
   exact ⟨fun n ↦ (x n).val, fun n ↦ ⟨(Classical.choose_spec (exists_smodEq_pow_smul_top_and_mkQ_eq
       h (y' := eval I _ (n + 1) y) (by simp) (x n).2)).1, (x n).property⟩⟩
 
+section finsuppSum
+
+set_option backward.isDefEq.respectTransparency false
+
+open Finsupp
+
+variable {σ : Type*}
+
+variable (σ M I) in
+/-- The canonical map from the finitely supported functions of adic completions to
+the adic completion of finitely supported functions. This is an isomorphism if `σ` is finite. -/
+def finsuppSum : (σ →₀ (AdicCompletion I M)) →ₗ[AdicCompletion I R] AdicCompletion I (σ →₀ M) :=
+  lsum (AdicCompletion I R) fun i ↦ map I (lsingle i)
+
+@[simp]
+theorem finsuppSum_single_of (i : σ) (m : M) : finsuppSum I M σ (single i (of I M m)) =
+    of I (σ →₀ M) (single i m) := by
+  ext; simp [finsuppSum]
+
+theorem map_finsuppLEquivDirectSum_comp_finsuppSum [DecidableEq σ] :
+    map I (finsuppLEquivDirectSum R M σ) ∘ₗ finsuppSum I M σ = sum I (fun _ : σ ↦ M) ∘ₗ
+      (finsuppLEquivDirectSum (AdicCompletion I R) (AdicCompletion I M) σ) := by
+  ext; simp [finsuppSum]
+
+variable [Fintype σ]
+
+variable (σ M I) in
+/-- If `σ` is finite, `AdicCompletion.finsuppSumInv` is
+an inverse for `AdicCompletion.finsuppSum`. -/
+def finsuppSumInv : AdicCompletion I (σ →₀ M) →ₗ[AdicCompletion I R] (σ →₀ (AdicCompletion I M)) :=
+  (linearEquivFunOnFinite (AdicCompletion I R) (AdicCompletion I M) σ).symm ∘ₗ
+    .pi (fun i ↦ map I (lapply i))
+
+theorem finsuppSumInv_comp_map_finsuppLEquivDirectSum_symm [DecidableEq σ] :
+    finsuppSumInv I M σ ∘ₗ map I (finsuppLEquivDirectSum R M σ).symm =
+      ((finsuppLEquivDirectSum (AdicCompletion I R) (AdicCompletion I M) σ)).symm ∘ₗ
+    sumInv I (fun _ : σ ↦ M) := by ext; rfl
+
+theorem finsuppSumInv_comp_sum : finsuppSumInv I M σ ∘ₗ finsuppSum I M σ = .id := by
+  classical
+  trans (finsuppSumInv I M σ ∘ₗ map I (finsuppLEquivDirectSum R M σ).symm) ∘ₗ
+    map I (finsuppLEquivDirectSum R M σ).toLinearMap ∘ₗ finsuppSum I M σ
+  · rw [LinearMap.comp_assoc]; nth_rw 2 [← LinearMap.comp_assoc]
+    simp [map_comp]
+  rw [finsuppSumInv_comp_map_finsuppLEquivDirectSum_symm,
+    map_finsuppLEquivDirectSum_comp_finsuppSum, LinearMap.comp_assoc]
+  nth_rw 2 [← LinearMap.comp_assoc]
+  simp [sumInv_comp_sum]
+
+theorem finsuppSum_comp_sumInv : finsuppSum I M σ ∘ₗ finsuppSumInv I M σ = .id := by
+  refine LinearMap.ext fun _ ↦ ?_
+  simp [finsuppSum, finsuppSumInv, sum_fintype, map_comp_apply]
+  simp [← LinearMap.sum_apply, ← map_sum, sum_lsingle_comp_lapply]
+
+@[simp]
+theorem finsuppSumInv_single_of (i : σ) (m : M) :
+    finsuppSumInv I M σ (of I (σ →₀ M) (single i m)) = single i (of I M m) := by
+  simp [← finsuppSum_single_of, ← comp_apply, finsuppSumInv_comp_sum]
+
+end finsuppSum
+
 end AdicCompletion
 
 open AdicCompletion Submodule
