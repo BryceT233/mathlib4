@@ -9,6 +9,7 @@ public import Mathlib.Algebra.DirectSum.Basic
 public import Mathlib.LinearAlgebra.SModEq.Pointwise
 public import Mathlib.RingTheory.AdicCompletion.Basic
 public import Mathlib.RingTheory.AdicCompletion.Algebra
+public import Mathlib.Algebra.DirectSum.Finsupp
 
 /-!
 # Functoriality of adic completions
