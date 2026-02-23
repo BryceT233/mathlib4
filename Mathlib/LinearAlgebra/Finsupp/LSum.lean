@@ -237,6 +237,9 @@ theorem lcongr_symm {ι κ : Sort _} (e₁ : ι ≃ κ) (e₂ : M ≃ₛₗ[σ] 
 
 end Equiv
 
+theorem sum_lsingle_comp_lapply [Fintype α] : ∑ a : α, lsingle a ∘ₗ (lapply a) =
+    (.id : (α →₀ M) →ₗ[R] (α →₀ M)) := by ext; simp
+
 end Finsupp
 
 variable {R : Type*} {M : Type*} {N : Type*}
