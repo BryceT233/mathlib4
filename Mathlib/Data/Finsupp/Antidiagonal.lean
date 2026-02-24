@@ -83,9 +83,9 @@ theorem antidiagonal_image_prodMap_embDomain {β : Type*} [DecidableEq β] (f : 
     ⟨v.comapDomain f f.injective.injOn, ?_, ?_, ?_⟩⟩⟩
   · rw [← hw, ← hz, ← embDomain_add, h]
   · rw [← comapDomain_add_of_injective f.injective, h, comapDomain_embDomain]
-  · rw [embDomain_comapDomain (mem_range_embDomain_iff.mp
+  · rw [embDomain_comapDomain ((mem_range_embDomain_iff ..).mp
       (isLowerSet_range_embDomain f (le_iff_exists_add.mpr ⟨v, h.symm⟩) (by simp)))]
-  · rw [embDomain_comapDomain (mem_range_embDomain_iff.mp
+  · rw [embDomain_comapDomain ((mem_range_embDomain_iff ..).mp
       (isLowerSet_range_embDomain f (le_iff_exists_add'.mpr ⟨u, h.symm⟩) (by simp)))]
 
 end Finsupp
