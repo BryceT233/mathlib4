@@ -72,12 +72,10 @@ theorem IsHausdorff.eq_iff_smodEq [IsHausdorff I M] {x y : M} :
   apply IsHausdorff.haus' (I := I) (x - y)
   simpa [SModEq.sub_mem] using h
 
-theorem IsHausdorff.map_algebraMap_iff [CommRing S] [Algebra R S] :
-    IsHausdorff (I.map (algebraMap R S)) S ↔ IsHausdorff I S := by
-  simp only [isHausdorff_iff, smul_eq_mul, Ideal.mul_top, Ideal.smul_top_eq_map]
-  congr!
-  simp only [← Ideal.map_pow]
-  rfl
+theorem IsHausdorff.map_algebraMap_iff [CommRing S] [Module S M] [Algebra R S]
+    [IsScalarTower R S M] : IsHausdorff (I.map (algebraMap R S)) M ↔ IsHausdorff I M := by
+  simp [isHausdorff_iff, ← Ideal.map_pow, ← SModEq.restrictScalars R,
+    restrictScalars_map_smul_eq_smul_restrictScalars]
 
 theorem IsHausdorff.of_map [CommRing S] [Module S M] {J : Ideal S} [Algebra R S]
     [IsScalarTower R S M] (hIJ : I.map (algebraMap R S) ≤ J) [IsHausdorff J M] :
@@ -151,6 +149,11 @@ theorem isPrecomplete_iff :
         (∀ {m n}, m ≤ n → f m ≡ f n [SMOD (I ^ m • ⊤ : Submodule R M)]) →
           ∃ L : M, ∀ n, f n ≡ L [SMOD (I ^ n • ⊤ : Submodule R M)] :=
   ⟨fun h => h.1, fun h => ⟨h⟩⟩
+
+theorem IsPrecomplete.map_algebraMap_iff [CommRing S] [Module S M] [Algebra R S]
+    [IsScalarTower R S M] : IsPrecomplete (I.map (algebraMap R S)) M ↔ IsPrecomplete I M := by
+  simp [isPrecomplete_iff, ← Ideal.map_pow, ← SModEq.restrictScalars R,
+    restrictScalars_map_smul_eq_smul_restrictScalars]
 
 variable (I M)
 
@@ -697,6 +700,10 @@ end AdicCompletion
 namespace IsAdicComplete
 
 open AdicCompletion
+
+theorem map_algebraMap_iff [CommRing S] [Module S M] [Algebra R S]
+    [IsScalarTower R S M] : IsAdicComplete I M ↔ IsAdicComplete (I.map (algebraMap R S)) M := by
+  simp [isAdicComplete_iff, IsPrecomplete.map_algebraMap_iff, IsHausdorff.map_algebraMap_iff]
 
 section lift
 
