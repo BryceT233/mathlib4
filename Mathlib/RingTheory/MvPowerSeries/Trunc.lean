@@ -285,8 +285,6 @@ end TruncLE
 
 section TruncTotal
 
-set_option backward.isDefEq.respectTransparency false
-
 variable {n : ℕ} [Finite σ] [CommSemiring R]
 
 /-- The truncation of a multivariate formal power series at a total degree `n`
