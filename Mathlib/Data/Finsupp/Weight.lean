@@ -263,8 +263,8 @@ lemma range_single_one :
     obtain ⟨a, rfl⟩ := (Finsupp.sum_eq_one_iff _).mp hp
     use a
 
-theorem degree_mapDomain_eq {M τ : Type*} {f : σ → τ} [AddCommMonoid M] [Subsingleton (AddUnits M)]
-    {x : σ →₀ M} : degree (x.mapDomain f) = degree x := by
+theorem degree_mapDomain_eq {M τ : Type*} (f : σ → τ) [AddCommMonoid M] [Subsingleton (AddUnits M)]
+    (x : σ →₀ M) : degree (x.mapDomain f) = degree x := by
   classical
   trans (x.mapDomain f).sum (fun _ ↦ id)
   · simp [degree, sum]
