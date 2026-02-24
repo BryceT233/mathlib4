@@ -253,8 +253,8 @@ instance (priority := 100) : IsUniformAddGroup R :=
 instance (priority := 100) : IsLinearTopology R R := i.isLinearTopology
 
 variable {R} in
-theorem continuous_of_map_le {S : Type*} [CommRing S] [WithIdeal S] {f : R →+* S}
-    (hf : i.map f ≤ i) : Continuous f := continuous_of_continuousAt_zero f (by
+theorem uniformContinuous_of_map_le {S : Type*} [CommRing S] [WithIdeal S] {f : R →+* S}
+    (hf : i.map f ≤ i) : UniformContinuous f := uniformContinuous_of_continuousAt_zero f (by
   rw [ContinuousAt, map_zero, i.hasBasis_nhds_zero_adic.tendsto_iff i.hasBasis_nhds_zero_adic]
   refine fun n _ ↦ ⟨n, trivial, Ideal.map_le_iff_le_comap.mp ?_⟩
   simpa [Ideal.map_pow] using Ideal.pow_right_mono hf n)
