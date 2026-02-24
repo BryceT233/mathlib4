@@ -77,3 +77,26 @@ protected lemma IsAdic.isAdicComplete_iff : IsAdicComplete I R ↔ CompleteSpace
   rw [isAdicComplete_iff, hI.isHausdorff_iff, hI.isPrecomplete_iff, and_comm]
 
 end UniformSpace
+
+section congrRingEquiv
+
+variable {R S : Type*} [CommRing R] [CommRing S] (I : Ideal R) (e : R ≃+* S)
+
+theorem IsPrecomplete.congr_ringEquiv : IsPrecomplete (I.map e) S ↔ IsPrecomplete I R := by
+  letI : WithIdeal R := { i := I }
+  letI : WithIdeal S := { i := I.map e }
+  rw [iff_comm, IsAdic.isPrecomplete_iff (by rfl), IsAdic.isPrecomplete_iff (by rfl)]
+  exact completeSpace_congr (e := WithIdeal.uniformEquiv e (by rfl)) (by
+    simpa using UniformEquiv.isUniformEmbedding ..)
+
+theorem IsHausdorff.congr_ringEquiv : IsHausdorff (I.map e) S ↔ IsHausdorff I R := by
+  letI : WithIdeal R := { i := I }
+  letI : WithIdeal S := { i := I.map e }
+  rw [iff_comm, IsAdic.isHausdorff_iff (by rfl), IsAdic.isHausdorff_iff (by rfl)]
+  exact ⟨fun _ ↦ (WithIdeal.uniformEquiv e (by rfl)).toHomeomorph.t2Space, fun _ ↦
+    (WithIdeal.uniformEquiv e (by rfl)).toHomeomorph.symm.t2Space⟩
+
+theorem IsAdicComplete.congr_ringEquiv : IsAdicComplete (I.map e) S ↔ IsAdicComplete I R := by
+  simp [isAdicComplete_iff, IsHausdorff.congr_ringEquiv, IsPrecomplete.congr_ringEquiv]
+
+end congrRingEquiv
