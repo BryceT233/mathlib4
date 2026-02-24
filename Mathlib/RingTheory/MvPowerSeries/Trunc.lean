@@ -451,7 +451,8 @@ lemma truncTotalToAdicCompletionAlgEquiv_apply (p : MvPowerSeries σ R) :
 @[simp]
 lemma truncTotalToAdicCompletionAlgEquiv_symm_apply
     (x : AdicCompletion (MvPolynomial.idealOfVars σ R) (MvPolynomial σ R)) :
-      (truncTotalToAdicCompletionAlgEquiv σ R).symm x = truncTotalToAdicCompletionInv σ R x := by rfl
+      (truncTotalToAdicCompletionAlgEquiv σ R).symm x = truncTotalToAdicCompletionInv σ R x := by
+  rfl
 
 end TruncTotal
 
