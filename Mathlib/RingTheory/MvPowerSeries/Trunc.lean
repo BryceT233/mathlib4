@@ -61,7 +61,7 @@ public import Mathlib.RingTheory.AdicCompletion.Algebra
 
 -/
 
-public section
+@[expose] public section
 
 noncomputable section
 
