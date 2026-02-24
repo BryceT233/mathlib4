@@ -1311,37 +1311,36 @@ theorem sigmaFinsuppAddEquivPiFinsupp_apply {α : Type*} {ιs : η → Type*} [A
 
 end Sigma
 
-lemma mem_range_embDomain_iff {α β M : Type*} [AddCommMonoid M] {f : α ↪ β}
-    {x : β →₀ M} : x ∈ Set.range (embDomain f) ↔ ↑x.support ⊆ Set.range f := by
+lemma mem_range_embDomain_iff [AddCommMonoid M] (f : α ↪ β) {x : β →₀ M} :
+    x ∈ Set.range (embDomain f) ↔ ↑x.support ⊆ Set.range f := by
   convert mem_range_mapDomain_iff _ f.injective _
   · ext; rw [embDomain_eq_mapDomain]
   · grind
 
 @[simp]
-lemma embDomain_refl {α M : Type*} [Zero M] :
-    embDomain (M := M) (Function.Embedding.refl α) = id := by
+lemma embDomain_refl [Zero M] : embDomain (M := M) (Function.Embedding.refl α) = id := by
   ext; simp [embDomain_apply]
 
-theorem embDomain_comp {α β γ M : Type*} [AddCommMonoid M] {v : α →₀ M}
-    {f : α ↪ β} {g : β ↪ γ} : embDomain (f.trans g) v = embDomain g (embDomain f v) := by
+theorem embDomain_comp [AddCommMonoid M] {v : α →₀ M} {f : α ↪ β} {g : β ↪ γ} :
+    embDomain (f.trans g) v = embDomain g (embDomain f v) := by
   simp only [embDomain_eq_mapDomain, ← mapDomain_comp]
   rfl
 
-theorem mapDomain_support_of_subsingletonAddUnits {M σ τ : Type*} [DecidableEq τ] [AddCommMonoid M]
-    {f : σ → τ} [Subsingleton (AddUnits M)] {x : σ →₀ M} :
-    (x.mapDomain f).support = x.support.image f := by
+theorem mapDomain_support_of_subsingletonAddUnits [DecidableEq β] [AddCommMonoid M]
+    (f : α → β) [Subsingleton (AddUnits M)] (x : α →₀ M) :
+      (x.mapDomain f).support = x.support.image f := by
   ext t
   rw [mem_support_iff, ne_eq, Finset.mem_image]
   refine ⟨?_, fun ⟨i, i_in, hi⟩ ↦ ?_⟩
   · simpa [mapDomain, sum, single_apply] using fun i h h' _ ↦ ⟨i, h, h'⟩
   simpa [mapDomain, sum, ← hi, single_apply] using ⟨i, by simp [mem_support_iff.mp i_in]⟩
 
-theorem mapDomain_apply_eq_sum {M σ τ : Type*} [DecidableEq τ] [AddCommMonoid M] {f : σ → τ}
-    {x : σ →₀ M} {a : σ} : (x.mapDomain f) (f a) = ∑ i ∈ x.support with f i = f a, x i := by
+theorem mapDomain_apply_eq_sum [DecidableEq β] [AddCommMonoid M] (f : α → β)
+    (x : α →₀ M) {a : α} : (x.mapDomain f) (f a) = ∑ i ∈ x.support with f i = f a, x i := by
   simp [mapDomain, sum, single_apply, Finset.sum_ite]
 
-theorem mapDomain_apply_eq_zero_iff {M σ τ : Type*} [AddCommMonoid M] {f : σ → τ}
-    [Subsingleton (AddUnits M)] {x : σ →₀ M} : mapDomain (M := M) f x = 0 ↔ x = 0 := by
+theorem mapDomain_apply_eq_zero_iff [AddCommMonoid M] (f : α → β) [Subsingleton (AddUnits M)]
+    (x : α →₀ M) : mapDomain (M := M) f x = 0 ↔ x = 0 := by
   classical
   refine ⟨fun h ↦ Finsupp.ext (fun i ↦ ?_), fun h ↦ by rw [h, mapDomain_zero]⟩
   replace h := Finsupp.ext_iff.mp h (f i)
