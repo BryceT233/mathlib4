@@ -7,7 +7,8 @@ module
 
 public import Mathlib.RingTheory.MvPowerSeries.Basic
 public import Mathlib.RingTheory.MvPolynomial.Ideal
-public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
+public import Mathlib.Data.Finsupp.Interval
+public import Mathlib.RingTheory.AdicCompletion.Algebra
 
 /-!
 
@@ -451,12 +452,6 @@ lemma toAdicCompletionAlgEquiv_apply (p : MvPowerSeries σ R) :
 lemma toAdicCompletionAlgEquiv_symm_apply
     (x : AdicCompletion (MvPolynomial.idealOfVars σ R) (MvPolynomial σ R)) :
       (toAdicCompletionAlgEquiv σ R).symm x = toAdicCompletionInv σ R x := by rfl
-
-/-- Multivariate power series is flat over multivariate polynomials
-when the coefficient ring is noetherian and the index is finite. -/
-instance flat_of_isNoetherian [IsNoetherianRing R] :
-    Module.Flat (MvPolynomial σ R) (MvPowerSeries σ R) :=
-  (Module.Flat.equiv_iff (toAdicCompletionAlgEquiv σ R).toLinearEquiv).mpr inferInstance
 
 end TruncTotal
 
