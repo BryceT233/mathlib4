@@ -6,7 +6,6 @@ Authors: Johan Commelin, Kenny Lau
 module
 
 public import Mathlib.RingTheory.MvPowerSeries.Basic
-public import Mathlib.Data.Finsupp.Interval
 public import Mathlib.RingTheory.MvPolynomial.Ideal
 public import Mathlib.RingTheory.AdicCompletion.AsTensorProduct
 
