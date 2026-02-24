@@ -16,8 +16,8 @@ public import Mathlib.RingTheory.MvPowerSeries.Trunc
 This file establishes a number of equivalences related to power series rings.
 
 * `MvPowerSeries.toAdicCompletionAlgEquiv` : the canonical isomorphism from
-  multivariate power series to the adic completion of multivariate polynomials at
-  the ideal spanned by all variables when the index is finite.
+  multivariate power series to the adic completion of multivariate polynomials
+  with respect to the ideal spanned by all variables when the index is finite.
 
 -/
 
@@ -51,7 +51,7 @@ lemma truncTotal_mul_sub_mul_truncTotal_mem_pow_idealOfVars (p q : MvPowerSeries
     coeff_truncTotal_mul_truncTotal_eq_coeff_mul _ _ hx]
 
 /-- The canonical map induced by `truncTotal` from multivariate power series to
-the quotient ring of multivariate plynomials at its `n`-th power of
+the quotient ring of multivariate polynomials with respect to the `n`-th power of
 the ideal spanned by all variables. -/
 @[simps]
 def truncTotalAlgHom (σ R : Type*) [Finite σ] [CommRing R] (n : ℕ) :
