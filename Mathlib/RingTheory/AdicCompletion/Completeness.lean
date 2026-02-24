@@ -174,27 +174,4 @@ theorem isAdicComplete (h : I.FG) : IsAdicComplete I (AdicCompletion I M) where
     rw [SModEq.sub_mem, pow_smul_top_eq_eval_ker h]
     simp [L]
 
-section isScalarTower
-
-open Submodule
-
-variable {S : Type*} [CommRing S]
-variable [Module S M] [Algebra R S] [IsScalarTower R S M]
-
-instance [IsHausdorff I M] : IsHausdorff (I.map (algebraMap R S)) M where
-  haus' x hx := IsHausdorff.eq_iff_smodEq (I := I) (M := M).mpr (fun n ↦ by
-    specialize hx n
-    rwa [← Ideal.map_pow, ← SModEq.restrictScalars R,
-      restrictScalars_map_smul_eq_smul_restrictScalars, restrictScalars_top] at hx)
-
-instance [IsPrecomplete I M] : IsPrecomplete (I.map (algebraMap R S)) M where
-  prec' x hx := by
-    simp only [← Ideal.map_pow, ← SModEq.restrictScalars R,
-      restrictScalars_map_smul_eq_smul_restrictScalars, restrictScalars_self] at hx ⊢
-    exact IsPrecomplete.prec' _ hx
-
-instance [IsAdicComplete I M] : IsAdicComplete (I.map (algebraMap R S)) M where
-
-end isScalarTower
-
 end AdicCompletion
