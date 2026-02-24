@@ -9,6 +9,7 @@ public import Mathlib.RingTheory.Ideal.Maps
 public import Mathlib.Topology.Algebra.IsUniformGroup.Defs
 public import Mathlib.Topology.Algebra.Nonarchimedean.Bases
 public import Mathlib.Topology.Algebra.TopologicallyNilpotent
+public import Mathlib.Topology.UniformSpace.Equiv
 
 import Mathlib.Topology.Algebra.UniformRing  -- shake: keep (used in `example` only)
 
@@ -258,6 +259,15 @@ theorem uniformContinuous_of_map_le {S : Type*} [CommRing S] [WithIdeal S] {f : 
   rw [ContinuousAt, map_zero, i.hasBasis_nhds_zero_adic.tendsto_iff i.hasBasis_nhds_zero_adic]
   refine fun n _ ↦ ⟨n, trivial, Ideal.map_le_iff_le_comap.mp ?_⟩
   simpa [Ideal.map_pow] using Ideal.pow_right_mono hf n)
+
+variable {R} in
+/-- A ring equivalence induces a uniform equivalence with respect to the adic topologies,
+provided it preserves the defining ideals. -/
+def uniformEquiv {S : Type*} [CommRing S] [WithIdeal S] (e : R ≃+* S)
+    (h : i.map e.toRingHom = i) : UniformEquiv R S where
+  __ := e
+  uniformContinuous_toFun := uniformContinuous_of_map_le (f := e.toRingHom) (by rw [h])
+  uniformContinuous_invFun := uniformContinuous_of_map_le (f := e.symm.toRingHom) (by simp [← h])
 
 variable {R} in
 lemma isTopologicallyNilpotent_of_mem {a : R} (ha : a ∈ i) : IsTopologicallyNilpotent a := by
