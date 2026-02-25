@@ -280,16 +280,16 @@ section TendstoCofinite
 variable {f : α → β} {g : β → ι}
 
 /-- The class of functions `f` such that `Tendsto f cofinite cofinite`. -/
-@[mk_iff] class TendstoCofinite (f : α → β) : Prop where
+@[mk_iff] class TendstoCofinite {α β : Type*} (f : α → β) : Prop where
   tendsto_cofinite : Tendsto f cofinite cofinite
 
-lemma TendstoCofinite.finite_preimage (h : TendstoCofinite f) (s : Finset β) :
+lemma TendstoCofinite.finite_preimage (h : TendstoCofinite f) {s : Set β} (hs : s.Finite) :
     Set.Finite (f ⁻¹' s) := by
   simpa [compl_eq_univ_diff] using h.tendsto_cofinite (show univ \ s ∈ cofinite by
-    simp [compl_eq_univ_diff])
+    simpa [compl_eq_univ_diff])
 
 lemma TendstoCofinite.finite_preimage_singleton (h : TendstoCofinite f) (b : β) :
-    Set.Finite (f ⁻¹' {b}) := by simpa using h.finite_preimage ({b} : Finset β)
+    Set.Finite (f ⁻¹' {b}) := by simpa using h.finite_preimage (by simp)
 
 theorem tendstoCofinite_iff_finite_preimage_singleton : TendstoCofinite f ↔
     ∀ b : β, Set.Finite (f ⁻¹' {b}) := ⟨fun h ↦ TendstoCofinite.finite_preimage_singleton h,
@@ -300,6 +300,6 @@ lemma Function.Injective.tendstoCofinite (h : f.Injective) : TendstoCofinite f :
 
 lemma TendstoCofinite.comp (h' : TendstoCofinite g) (h : TendstoCofinite f) :
     TendstoCofinite (g ∘ f) := tendstoCofinite_iff_finite_preimage_singleton.mpr (fun r ↦ by
-  simpa using h.finite_preimage ((h'.finite_preimage ({r} : Finset ι)).toFinset))
+  simpa using h.finite_preimage (h'.finite_preimage (by simp)))
 
 end TendstoCofinite
