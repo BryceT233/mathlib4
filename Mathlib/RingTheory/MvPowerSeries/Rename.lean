@@ -144,7 +144,7 @@ def rename : MvPowerSeries σ R →ₐ[R] MvPowerSeries τ R where
 theorem coeff_rename {p : MvPowerSeries σ R} {x : τ →₀ ℕ} : coeff x (rename h p) =
     ((mapDomain_tendstoCofinite h).finite_preimage_singleton x).toFinset.sum (p.coeff ·) := by rfl
 
-theorem rename_monomial (x) (r : R) : rename h (monomial x r) =
+theorem rename_monomial (x : σ →₀ ℕ) (r : R) : rename h (monomial x r) =
     monomial (mapDomain f x) r := renameFun_monomial h ..
 
 @[simp]
