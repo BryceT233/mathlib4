@@ -280,7 +280,7 @@ section TendstoCofinite
 variable {f : α → β} {g : β → ι}
 
 /-- The class of functions `f` such that `Tendsto f cofinite cofinite`. -/
-@[mk_iff] class TendstoCofinite {α β : Type*} (f : α → β) : Prop where
+@[mk_iff] class TendstoCofinite (f : α → β) : Prop where
   tendsto_cofinite : Tendsto f cofinite cofinite
 
 lemma TendstoCofinite.finite_preimage (h : TendstoCofinite f) {s : Set β} (hs : s.Finite) :
