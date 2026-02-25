@@ -32,70 +32,34 @@ noncomputable section
 open Finsupp
 
 variable {σ τ γ : Type*} {f : σ → τ} {g : τ → γ}
-
-section FiberFinite
-
 variable {M : Type*} [AddCommMonoid M]
 
-namespace Function
-
-variable (f) in
-/-- `Function.FiberFinite f` means that for every `y` in the codomain,
-the preimage `f ⁻¹' {y}` is a finite set. -/
-def FiberFinite := ∀ y, (f ⁻¹' {y}).Finite
-
-lemma FiberFinite.finite_preimage (h : f.FiberFinite) {s : Set τ} (hs : s.Finite) :
-    (f ⁻¹' s).Finite := by
-  refine Set.Finite.induction_on s hs (by simp) (fun {a} _ _ _ h' ↦ ?_)
-  rw [Set.insert_eq, Set.preimage_union]
-  exact Set.Finite.union (h a) h'
-
-open Filter in
-theorem fiberFinite_iff_tendsto_cofinite : f.FiberFinite ↔ Tendsto f cofinite cofinite :=
-  ⟨fun h _ ↦ by simpa using h.finite_preimage, fun h i ↦ by
-    simpa [Set.compl_eq_univ_diff] using h (show Set.univ \ {i} ∈ cofinite by
-      simp [Set.compl_eq_univ_diff])⟩
-
-open Filter in
-lemma FiberFinite.tendsto_cofinite (h : f.FiberFinite) : Tendsto f cofinite cofinite :=
-  fiberFinite_iff_tendsto_cofinite.mp h
-
-lemma Injective.fiberFinite (h : f.Injective) : f.FiberFinite :=
-  fiberFinite_iff_tendsto_cofinite.mpr h.tendsto_cofinite
-
-lemma FiberFinite.comp (h' : g.FiberFinite) (h : f.FiberFinite) :
-    (g ∘ f).FiberFinite := fun i ↦ by
-  simpa [Set.preimage_comp] using h.finite_preimage (h' i)
-
-/-- Given `f : σ → τ` with finite fibers and `v : σ → M`, `mapDomain f v : τ → M`
-is the function whose value at `a : τ` is the sum of `v x` over all `x`
-such that `f x = a`. -/
-def FiberFinite.mapDomain (h : f.FiberFinite) (v : σ → M) : τ → M :=
-  fun i ↦ (h i).toFinset.sum v
+/-- Given `f : σ → τ` with `TendstoCofinite f` and `v : σ → M`,
+`TendstoCofinite.mapDomain f v : τ → M` is the function whose value at `b : τ` is
+the sum of `v x` over all `x` such that `f x = b`. -/
+def TendstoCofinite.mapDomain (h : TendstoCofinite f) (v : σ → M) : τ → M :=
+  fun i ↦ (h.finite_preimage_singleton i).toFinset.sum v
 
 @[simp]
-lemma FiberFinite.mapDomain_add (h : f.FiberFinite) {u v : σ → M} :
+lemma TendstoCofinite.mapDomain_add (h : TendstoCofinite f) {u v : σ → M} :
     h.mapDomain (u + v) = h.mapDomain u + h.mapDomain v := by
   ext; simp [mapDomain, Finset.sum_add_distrib]
 
 @[simp]
-lemma FiberFinite.mapDomain_smul {R : Type*} [DistribSMul R M] (h : f.FiberFinite)
+lemma TendstoCofinite.mapDomain_smul {R : Type*} [DistribSMul R M] (h : TendstoCofinite f)
     {r : R} {v : σ → M} : h.mapDomain (r • v) = r • (h.mapDomain v) := by
   ext; simp [mapDomain, Finset.smul_sum]
 
-theorem FiberFinite.mapDomain_eq_zero_of_notMem_range (h : f.FiberFinite) {v : σ → M} {i : τ}
-    (h' : i ∉ Set.range f) : h.mapDomain v i = 0 := by
+theorem TendstoCofinite.mapDomain_eq_zero_of_notMem_range (h : TendstoCofinite f) {v : σ → M}
+    {i : τ} (h' : i ∉ Set.range f) : h.mapDomain v i = 0 := by
   rw [← Set.preimage_singleton_eq_empty] at h'
   simp [mapDomain, Set.Finite.toFinset, h']
 
-end Function
-
-namespace Finsupp
-
-theorem mapDomain_fiberFinite (h : f.FiberFinite) : (mapDomain (M := ℕ) f).FiberFinite := by
+theorem Finsupp.mapDomain_tendstoCofinite (h : TendstoCofinite f) :
+    TendstoCofinite (mapDomain (M := ℕ) f) := by
   classical
-  intro x
-  let s := Finset.sup x.support (fun t ↦ (h t).toFinset)
+  refine tendstoCofinite_iff_finite_preimage_singleton.mpr fun x ↦ ?_
+  let s := Finset.sup x.support (fun t ↦ (h.finite_preimage_singleton t).toFinset)
   let e : s ↪ σ := Function.Embedding.subtype (fun u ↦ u ∈ s)
   refine Set.Finite.subset (Set.Finite.image (embDomain e) <|
     finite_of_degree_le (σ := s) (degree x)) ?_
@@ -108,33 +72,34 @@ theorem mapDomain_fiberFinite (h : f.FiberFinite) : (mapDomain (M := ℕ) f).Fib
   simpa [← hy, mapDomain, sum, Finset.subset_iff, single_apply, s] using
     fun i hi ↦ ⟨i, by simp [hi]⟩
 
-private theorem antidiagonal_renameFunAux [DecidableEq σ] (h : f.FiberFinite)
+private theorem antidiagonal_renameFunAux [DecidableEq σ] (h : TendstoCofinite f)
     (x : τ →₀ ℕ) : {p : (σ →₀ ℕ) × (σ →₀ ℕ) × (σ →₀ ℕ) | (p.1).mapDomain f = x ∧
       p.2 ∈ Finset.antidiagonal p.1}.Finite := by
-  apply Set.Finite.subset (s := ↑((mapDomain_fiberFinite h x).toFinset.sup
+  apply Set.Finite.subset
+    (s := ↑(((mapDomain_tendstoCofinite h).finite_preimage_singleton x).toFinset.sup
     (fun y ↦ Finset.product {y} (Finset.antidiagonal y))))
   · exact Finset.finite_toSet ..
-  · intro; aesop
+  · intro; simp
+    grind
 
-private theorem antidiagonal_renameFunAux' [DecidableEq τ] (h : f.FiberFinite)
+private theorem antidiagonal_renameFunAux' [DecidableEq τ] (h : TendstoCofinite f)
     (x : τ →₀ ℕ) : {p : ((τ →₀ ℕ) × (τ →₀ ℕ)) × (σ →₀ ℕ) × (σ →₀ ℕ) | p.1 ∈ Finset.antidiagonal x
-      ∧ p.2 ∈ (mapDomain_fiberFinite h p.1.1).toFinset ×ˢ
-    (mapDomain_fiberFinite h p.1.2).toFinset}.Finite := by
+      ∧ p.2 ∈ ((mapDomain_tendstoCofinite h).finite_preimage_singleton p.1.1).toFinset ×ˢ
+    ((mapDomain_tendstoCofinite h).finite_preimage_singleton p.1.2).toFinset}.Finite := by
   classical
   apply Set.Finite.subset (s := ↑((Finset.antidiagonal x).sup (fun q ↦ Finset.product {q}
-    ((mapDomain_fiberFinite h q.1).toFinset ×ˢ (mapDomain_fiberFinite h q.2).toFinset))))
+    (((mapDomain_tendstoCofinite h).finite_preimage_singleton q.1).toFinset ×ˢ
+      ((mapDomain_tendstoCofinite h).finite_preimage_singleton q.2).toFinset))))
   · exact Finset.finite_toSet ..
-  · intro; aesop
+  · intro; simp
+    grind
 
-private theorem antidiagonal_renameFunAuxImage [DecidableEq σ] [DecidableEq τ] (h : f.FiberFinite)
-    (x : τ →₀ ℕ) : (antidiagonal_renameFunAux' h x).toFinset.image (fun (_, b) ↦ (b.1 + b.2, b)) =
-      (antidiagonal_renameFunAux h x).toFinset := by
+private theorem antidiagonal_renameFunAuxImage [DecidableEq σ] [DecidableEq τ]
+    (h : TendstoCofinite f) (x : τ →₀ ℕ) :
+      (antidiagonal_renameFunAux' h x).toFinset.image (fun (_, b) ↦ (b.1 + b.2, b)) =
+    (antidiagonal_renameFunAux h x).toFinset := by
   ext ⟨_,_,_⟩
-  simp; aesop (add simp mapDomain_add)
-
-end Finsupp
-
-end FiberFinite
+  simp; grind [mapDomain_add]
 
 namespace MvPowerSeries
 
@@ -142,13 +107,14 @@ variable {R S : Type*} [CommSemiring R] [CommSemiring S]
 
 section rename
 
-variable (h : f.FiberFinite)
+variable (h : TendstoCofinite f)
 
 /-- Implementation detail for `rename`. Use `MvPowerSeries.rename` instead. -/
-def renameFun : MvPowerSeries σ R → MvPowerSeries τ R := (mapDomain_fiberFinite h).mapDomain
+def renameFun (h : TendstoCofinite f) : MvPowerSeries σ R → MvPowerSeries τ R :=
+  (mapDomain_tendstoCofinite h).mapDomain
 
-private lemma coeff_renameFun {p : MvPowerSeries σ R} {x : τ →₀ ℕ} :
-    (renameFun h p).coeff x = (mapDomain_fiberFinite h x).toFinset.sum (p.coeff ·) := by rfl
+private lemma coeff_renameFun {p : MvPowerSeries σ R} {x : τ →₀ ℕ} : (renameFun h p).coeff x =
+    ((mapDomain_tendstoCofinite h).finite_preimage_singleton x).toFinset.sum (p.coeff ·) := by rfl
 
 private lemma renameFun_monomial (x : σ →₀ ℕ) (r : R) :
     renameFun h (monomial x r) = monomial (mapDomain f x) r := by
@@ -163,7 +129,7 @@ private theorem renameFun_mul (p q : MvPowerSeries σ R) :
   simp only [coeff_renameFun, coeff_mul, sum_mul_sum, ← sum_product']
   rw [← sum_finset_product' (antidiagonal_renameFunAux h x).toFinset _ _ (by simp),
     ← sum_finset_product' (antidiagonal_renameFunAux' h x).toFinset _ _ (by simp),
-    ← antidiagonal_renameFunAuxImage h x, sum_image fun _ ↦ by simp; aesop]
+    ← antidiagonal_renameFunAuxImage h x, sum_image fun _ ↦ by simp; grind]
 
 /-- Rename all the variables in a multivariable power series by a function with finite fibers. -/
 @[no_expose]
@@ -175,19 +141,19 @@ def rename : MvPowerSeries σ R →ₐ[R] MvPowerSeries τ R where
   map_add' _ _ := by ext; simp [coeff_renameFun, Finset.sum_add_distrib]
   commutes' := renameFun_monomial h 0
 
-theorem coeff_rename {p : MvPowerSeries σ R} {x : τ →₀ ℕ} :
-    coeff x (rename h p) = (mapDomain_fiberFinite h x).toFinset.sum (p.coeff ·) := by rfl
+theorem coeff_rename {p : MvPowerSeries σ R} {x : τ →₀ ℕ} : coeff x (rename h p) =
+    ((mapDomain_tendstoCofinite h).finite_preimage_singleton x).toFinset.sum (p.coeff ·) := by rfl
 
-theorem rename_monomial (x) (r : R) :
-    rename h (monomial x r) = monomial (mapDomain f x) r := renameFun_monomial h ..
+theorem rename_monomial (x) (r : R) : rename h (monomial x r) =
+    monomial (mapDomain f x) r := renameFun_monomial h ..
 
 @[simp]
 theorem coeff_embDomain_rename {e : σ ↪ τ} {p : MvPowerSeries σ R} {x : σ →₀ ℕ} :
-    coeff (embDomain e x) (rename e.injective.fiberFinite p) = p.coeff x := by
+    coeff (embDomain e x) (rename e.injective.tendstoCofinite p) = p.coeff x := by
   rw [coeff_rename, Finset.sum_eq_single x _ (by simp [← embDomain_eq_mapDomain])]
   simpa using fun _ h h' ↦ by simp [← embDomain_eq_mapDomain, embDomain_inj, h'] at h
 
-lemma coeff_rename_eq_zero (p : MvPowerSeries σ R) {x : τ →₀ ℕ}
+theorem coeff_rename_eq_zero (p : MvPowerSeries σ R) {x : τ →₀ ℕ}
     (h' : x ∉ Set.range (mapDomain f)) : (rename h p).coeff x = 0 := by
   simp [coeff_rename, Set.Finite.toFinset, Set.preimage_singleton_eq_empty.mpr h']
 
@@ -203,26 +169,27 @@ theorem map_rename (F : R →+* S) (p : MvPowerSeries σ R) :
   ext; simp [coeff_rename]
 
 @[simp]
-theorem rename_rename (h' : g.FiberFinite) (p : MvPowerSeries σ R) :
+theorem rename_rename (h' : TendstoCofinite g) (p : MvPowerSeries σ R) :
     rename h' (rename h p) = rename (h'.comp h) p := by
   classical
   ext y; simp only [coeff_rename]
-  rw [← Finset.sum_finset_product' ((mapDomain_fiberFinite (h'.comp h) y).toFinset.image
-    (fun u ↦ (mapDomain f u, u))) _ _ (by simp; aesop (add simp mapDomain_comp)),
+  rw [← Finset.sum_finset_product'
+    (((mapDomain_tendstoCofinite (h'.comp h)).finite_preimage_singleton y).toFinset.image
+      (fun u ↦ (mapDomain f u, u))) _ _ (by simp; grind [mapDomain_comp]),
     Finset.sum_image (by simp)]
 
-lemma rename_comp_rename (h' : g.FiberFinite) :
+lemma rename_comp_rename (h' : TendstoCofinite g) :
     (rename (R := R) h').comp (rename h) = rename (h'.comp h) :=
   AlgHom.ext fun p ↦ rename_rename h h' p
 
 @[simp]
-theorem rename_id : rename (Function.injective_id.fiberFinite) =
+theorem rename_id : rename (Function.injective_id.tendstoCofinite) =
     AlgHom.id R (MvPowerSeries σ R) := by
   ext _ y
   simpa [coeff_rename] using Finset.sum_eq_single y (by simp) (by simp)
 
 lemma rename_id_apply (p : MvPowerSeries σ R) :
-    rename (Function.injective_id.fiberFinite) p = p := by simp
+    rename (Function.injective_id.tendstoCofinite) p = p := by simp
 
 @[simp]
 theorem constantCoeff_rename (p : MvPowerSeries σ R) :
@@ -231,7 +198,7 @@ theorem constantCoeff_rename (p : MvPowerSeries σ R) :
     coeff_rename, Finset.sum_eq_single 0 (by simp [mapDomain_apply_eq_zero_iff]) (by simp)]
 
 theorem rename_injective {e : σ ↪ τ} :
-    Function.Injective (rename (R := R) e.injective.fiberFinite) := by
+    Function.Injective (rename (R := R) e.injective.tendstoCofinite) := by
   intro _ _ h; ext x
   simpa using MvPowerSeries.ext_iff.mp h (embDomain e x)
 
@@ -239,8 +206,8 @@ variable (R) in
 /-- `rename` is an equivalence when the underlying map is an equivalence. -/
 @[simps apply]
 def renameEquiv (e : σ ≃ τ) : MvPowerSeries σ R ≃ₐ[R] MvPowerSeries τ R where
-  __ := rename e.injective.fiberFinite
-  invFun := rename e.symm.injective.fiberFinite
+  __ := rename e.injective.tendstoCofinite
+  invFun := rename e.symm.injective.tendstoCofinite
   left_inv _ := by simp
   right_inv _ := by simp
 
@@ -253,7 +220,7 @@ theorem renameEquiv_symm (f : σ ≃ τ) : (renameEquiv R f).symm = renameEquiv 
 @[simp]
 theorem renameEquiv_trans (e : σ ≃ τ) (f : τ ≃ γ) :
     (renameEquiv R e).trans (renameEquiv R f) = renameEquiv R (e.trans f) :=
-  AlgEquiv.ext (rename_rename e.injective.fiberFinite f.injective.fiberFinite)
+  AlgEquiv.ext (rename_rename e.injective.tendstoCofinite f.injective.tendstoCofinite)
 
 end rename
 
@@ -261,9 +228,9 @@ section killCompl
 
 variable {e : σ ↪ τ}
 
-variable (e) in
 /-- Implementation detail for `killCompl`. Use `MvPowerSeries.killCompl` instead. -/
-def killComplFun (p : MvPowerSeries τ R) : MvPowerSeries σ R := fun x ↦ coeff (embDomain e x) p
+def killComplFun (e : σ ↪ τ) (p : MvPowerSeries τ R) : MvPowerSeries σ R :=
+  fun x ↦ coeff (embDomain e x) p
 
 private theorem coeff_killComplFun (p : MvPowerSeries τ R) (x : σ →₀ ℕ) :
   coeff x (killComplFun e p) = coeff (embDomain e x) p := by rfl
@@ -287,12 +254,11 @@ private theorem killComplFun_mul (p q : MvPowerSeries τ R) :
     ((Function.Injective.injOn (Prod.map_injective.mpr ⟨embDomain_injective e,
       embDomain_injective e⟩)))]
 
-variable (e) in
 /-- Given an embedding `e : σ ↪ τ`, `MvPowerSeries.killComplFun e` is the function from
 `R[[τ]]` to `R[[σ]]` that is left inverse to `rename e.injective.fiberFinite : R[[σ]] → R[[τ]]`
 and sends the variables in the complement of the range of `e` to `0`. -/
 @[no_expose]
-def killCompl : MvPowerSeries τ R →ₐ[R] MvPowerSeries σ R where
+def killCompl (e : σ ↪ τ) : MvPowerSeries τ R →ₐ[R] MvPowerSeries σ R where
   toFun := killComplFun e
   map_one' := by simpa using killComplFun_monomial_embDomain 0 1
   map_mul' := killComplFun_mul
@@ -328,12 +294,12 @@ theorem killCompl_X_eq_zero {t : τ} (h : t ∉ Set.range e) :
   simpa using killCompl_monomial_eq_zero (1 : R) h
 
 theorem killCompl_comp_rename :
-    (killCompl e).comp (rename e.injective.fiberFinite) = AlgHom.id R _ := by
+    (killCompl e).comp (rename e.injective.tendstoCofinite) = AlgHom.id R _ := by
   ext; simp [coeff_killCompl]
 
 @[simp]
 theorem killCompl_rename_app (p : MvPowerSeries σ R) :
-    killCompl e (rename e.injective.fiberFinite p) = p :=
+    killCompl e (rename e.injective.tendstoCofinite p) = p :=
   AlgHom.congr_fun (killCompl_comp_rename) p
 
 end killCompl
