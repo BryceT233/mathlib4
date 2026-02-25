@@ -50,7 +50,7 @@ lemma TendstoCofinite.mapDomain_smul {R : Type*} [DistribSMul R M] (h : TendstoC
     {r : R} {v : σ → M} : h.mapDomain (r • v) = r • (h.mapDomain v) := by
   ext; simp [mapDomain, Finset.smul_sum]
 
-theorem TendstoCofinite.mapDomain_eq_zero_of_notMem_range (h : TendstoCofinite f) {v : σ → M}
+theorem TendstoCofinite.mapDomain_eq_zero (h : TendstoCofinite f) {v : σ → M}
     {i : τ} (h' : i ∉ Set.range f) : h.mapDomain v i = 0 := by
   rw [← Set.preimage_singleton_eq_empty] at h'
   simp [mapDomain, Set.Finite.toFinset, h']
