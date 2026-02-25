@@ -18,7 +18,7 @@ This file is patterned after `MvPolynomials/Rename.lean`
 
 ## Main declarations
 
-* `Function.FiberFinite`
+* `TendstoCofinite.mapDomain`
 * `MvPowerSeries.rename`
 * `MvPowerSeries.renameEquiv`
 * `MvPowerSeries.killCompl`
