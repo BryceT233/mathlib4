@@ -66,6 +66,14 @@ variable (σ R) in
 /-- The ideal spanned by all variables. -/
 noncomputable def idealOfVars : Ideal (MvPolynomial σ R) := .span (.range X)
 
+lemma idealOfVars_def : idealOfVars σ R = .span (.range X) := by rfl
+
+variable (σ R) in
+lemma idealOfVars_fg [Finite σ] : (idealOfVars σ R).FG := by
+  classical
+  letI := Fintype.ofFinite σ
+  exact ⟨Finset.image X Finset.univ, by simp [idealOfVars]⟩
+
 lemma idealOfVars_eq_restrictSupportIdeal :
     idealOfVars σ R = restrictSupportIdeal _ _ ((isUpperSet_Ici 1).preimage degree_mono) := by
   apply le_antisymm
