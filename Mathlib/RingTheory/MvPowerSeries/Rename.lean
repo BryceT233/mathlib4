@@ -244,7 +244,7 @@ private theorem killComplFun_monomial_eq_zero {x : τ →₀ ℕ} (r : R)
     (h : x ∉ Set.range (embDomain e)) : killComplFun e (monomial x r) = 0 := by
   classical
   ext; simp [coeff_killComplFun, coeff_monomial]
-  aesop
+  grind
 
 private theorem killComplFun_mul (p q : MvPowerSeries τ R) :
     killComplFun e (p * q) = killComplFun e p * killComplFun e q := by
