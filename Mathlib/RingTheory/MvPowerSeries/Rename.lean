@@ -41,16 +41,16 @@ def TendstoCofinite.mapDomain (h : TendstoCofinite f) (v : σ → M) : τ → M 
   fun i ↦ (h.finite_preimage_singleton i).toFinset.sum v
 
 @[simp]
-lemma TendstoCofinite.mapDomain_add (h : TendstoCofinite f) {u v : σ → M} :
+lemma TendstoCofinite.mapDomain_add (h : TendstoCofinite f) (u v : σ → M) :
     h.mapDomain (u + v) = h.mapDomain u + h.mapDomain v := by
   ext; simp [mapDomain, Finset.sum_add_distrib]
 
 @[simp]
 lemma TendstoCofinite.mapDomain_smul {R : Type*} [DistribSMul R M] (h : TendstoCofinite f)
-    {r : R} {v : σ → M} : h.mapDomain (r • v) = r • (h.mapDomain v) := by
+    (r : R) (v : σ → M) : h.mapDomain (r • v) = r • (h.mapDomain v) := by
   ext; simp [mapDomain, Finset.smul_sum]
 
-theorem TendstoCofinite.mapDomain_eq_zero (h : TendstoCofinite f) {v : σ → M}
+theorem TendstoCofinite.mapDomain_eq_zero (h : TendstoCofinite f) (v : σ → M)
     {i : τ} (h' : i ∉ Set.range f) : h.mapDomain v i = 0 := by
   rw [← Set.preimage_singleton_eq_empty] at h'
   simp [mapDomain, Set.Finite.toFinset, h']
@@ -141,19 +141,19 @@ def rename : MvPowerSeries σ R →ₐ[R] MvPowerSeries τ R where
   map_add' _ _ := by ext; simp [coeff_renameFun, Finset.sum_add_distrib]
   commutes' := renameFun_monomial h 0
 
-theorem coeff_rename {p : MvPowerSeries σ R} {x : τ →₀ ℕ} : coeff x (rename h p) =
+theorem coeff_rename (p : MvPowerSeries σ R) (x : τ →₀ ℕ) : coeff x (rename h p) =
     ((mapDomain_tendstoCofinite h).finite_preimage_singleton x).toFinset.sum (p.coeff ·) := by rfl
 
 theorem rename_monomial (x : σ →₀ ℕ) (r : R) : rename h (monomial x r) =
     monomial (mapDomain f x) r := renameFun_monomial h ..
 
 @[simp]
-theorem coeff_embDomain_rename {e : σ ↪ τ} {p : MvPowerSeries σ R} {x : σ →₀ ℕ} :
+theorem coeff_embDomain_rename (e : σ ↪ τ) (p : MvPowerSeries σ R) (x : σ →₀ ℕ) :
     coeff (embDomain e x) (rename e.injective.tendstoCofinite p) = p.coeff x := by
   rw [coeff_rename, Finset.sum_eq_single x _ (by simp [← embDomain_eq_mapDomain])]
   simpa using fun _ h h' ↦ by simp [← embDomain_eq_mapDomain, embDomain_inj, h'] at h
 
-theorem coeff_rename_eq_zero (p : MvPowerSeries σ R) {x : τ →₀ ℕ}
+theorem coeff_rename_eq_zero (p : MvPowerSeries σ R) (x : τ →₀ ℕ)
     (h' : x ∉ Set.range (mapDomain f)) : (rename h p).coeff x = 0 := by
   simp [coeff_rename, Set.Finite.toFinset, Set.preimage_singleton_eq_empty.mpr h']
 
@@ -197,7 +197,7 @@ theorem constantCoeff_rename (p : MvPowerSeries σ R) :
   rw [← coeff_zero_eq_constantCoeff_apply, ← coeff_zero_eq_constantCoeff_apply,
     coeff_rename, Finset.sum_eq_single 0 (by simp [mapDomain_apply_eq_zero_iff]) (by simp)]
 
-theorem rename_injective {e : σ ↪ τ} :
+theorem rename_injective (e : σ ↪ τ) :
     Function.Injective (rename (R := R) e.injective.tendstoCofinite) := by
   intro _ _ h; ext x
   simpa using MvPowerSeries.ext_iff.mp h (embDomain e x)
