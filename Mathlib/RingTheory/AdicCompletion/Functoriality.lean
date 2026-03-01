@@ -505,11 +505,20 @@ theorem finsuppSumInv_comp_sum : finsuppSumInv I M σ ∘ₗ finsuppSum I M σ =
 
 set_option backward.isDefEq.respectTransparency false in
 theorem finsuppSum_comp_sumInv : finsuppSum I M σ ∘ₗ finsuppSumInv I M σ = .id := by
-  refine LinearMap.ext fun _ ↦ ?_
-  simp only [finsuppSum, finsuppSumInv, coe_comp, coe_lsum, _root_.map_zero, implies_true,
-    sum_fintype, LinearEquiv.coe_coe, Function.comp_apply, linearEquivFunOnFinite_symm_apply,
-    pi_apply, map_comp_apply, id_coe, id_eq]
-  rw [← LinearMap.sum_apply, ← map_sum, sum_lsingle_comp_lapply, map_id, LinearMap.id_apply]
+  classical
+  trans map I (finsuppLEquivDirectSum R M σ).symm ∘ₗ
+    (map I (finsuppLEquivDirectSum R M σ).toLinearMap ∘ₗ finsuppSum I M σ) ∘ₗ
+      (finsuppLEquivDirectSum (AdicCompletion I R) (AdicCompletion I M) σ).symm ∘ₗ
+    (finsuppLEquivDirectSum (AdicCompletion I R) (AdicCompletion I M) σ).toLinearMap ∘ₗ
+      (finsuppSumInv I M σ ∘ₗ map I (finsuppLEquivDirectSum R M σ).symm) ∘ₗ
+    map I (finsuppLEquivDirectSum R M σ).toLinearMap
+  · simp [LinearMap.comp_assoc, map_comp]
+    simp [← LinearMap.comp_assoc, map_comp]
+  rw [finsuppSumInv_comp_map_finsuppLEquivDirectSum_symm,
+    map_finsuppLEquivDirectSum_comp_finsuppSum]
+  simp only [comp_assoc, LinearEquiv.comp_symm_assoc]
+  nth_rw 2 [← LinearMap.comp_assoc]
+  simp [sum_comp_sumInv, map_comp]
 
 @[simp]
 theorem finsuppSumInv_single_of (i : σ) (m : M) :
