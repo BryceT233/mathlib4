@@ -503,11 +503,12 @@ theorem finsuppSumInv_comp_sum : finsuppSumInv I M σ ∘ₗ finsuppSum I M σ =
   nth_rw 2 [← LinearMap.comp_assoc]
   simp [sumInv_comp_sum]
 
-set_option backward.isDefEq.respectTransparency false in
 theorem finsuppSum_comp_sumInv : finsuppSum I M σ ∘ₗ finsuppSumInv I M σ = .id := by
   refine LinearMap.ext fun _ ↦ ?_
-  simp [finsuppSum, finsuppSumInv, sum_fintype, map_comp_apply]
-  simp [← LinearMap.sum_apply, ← map_sum, sum_lsingle_comp_lapply]
+  simp only [finsuppSum, finsuppSumInv, coe_comp, coe_lsum, _root_.map_zero, implies_true,
+    sum_fintype, LinearEquiv.coe_coe, Function.comp_apply, linearEquivFunOnFinite_symm_apply,
+    pi_apply, map_comp_apply, id_coe, id_eq]
+  rw [← LinearMap.sum_apply, ← map_sum, sum_lsingle_comp_lapply, map_id, LinearMap.id_apply]
 
 @[simp]
 theorem finsuppSumInv_single_of (i : σ) (m : M) :
