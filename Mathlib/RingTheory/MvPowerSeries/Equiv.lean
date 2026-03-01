@@ -25,8 +25,6 @@ This file establishes a number of equivalences related to power series rings.
 
 noncomputable section
 
-set_option backward.isDefEq.respectTransparency false
-
 namespace MvPowerSeries
 
 section toAdicCompletion
