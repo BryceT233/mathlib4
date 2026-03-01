@@ -503,6 +503,7 @@ theorem finsuppSumInv_comp_sum : finsuppSumInv I M σ ∘ₗ finsuppSum I M σ =
   nth_rw 2 [← LinearMap.comp_assoc]
   simp [sumInv_comp_sum]
 
+set_option backward.isDefEq.respectTransparency false in
 theorem finsuppSum_comp_sumInv : finsuppSum I M σ ∘ₗ finsuppSumInv I M σ = .id := by
   refine LinearMap.ext fun _ ↦ ?_
   simp [finsuppSum, finsuppSumInv, sum_fintype, map_comp_apply]
